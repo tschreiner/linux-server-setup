@@ -5,6 +5,33 @@
       - resolver_client_nameservers | length > 0
     fail_msg: Define at least one external DNS resolver in resolver_client_nameservers.
 
+- name: Gather service facts for resolver selection
+  ansible.builtin.service_facts:
+  when: resolver_client_manage_systemd_resolved | bool
+
+- name: Determine whether systemd-resolved can be managed
+  ansible.builtin.set_fact:
+    resolver_client_use_systemd_resolved: >-
+      {{
+        (resolver_client_manage_systemd_resolved | bool)
+        and (ansible_service_mgr == 'systemd')
+        and ('systemd-resolved.service' in ansible_facts.services)
+      }}
+
+- name: Default to direct resolv.conf management when systemd-resolved is disabled
+  ansible.builtin.set_fact:
+    resolver_client_use_systemd_resolved: false
+  when: not resolver_client_manage_systemd_resolved | bool
+
+- name: Explain resolver fallback when systemd-resolved is unavailable
+  ansible.builtin.debug:
+    msg: >-
+      systemd-resolved is not available on this host; falling back to direct
+      management of {{ resolver_client_resolv_conf_path }}.
+  when:
+    - resolver_client_manage_systemd_resolved | bool
+    - not resolver_client_use_systemd_resolved | bool
+
 - name: Ensure systemd-resolved configuration directory exists
   ansible.builtin.file:
     path: /etc/systemd/resolved.conf.d
@@ -12,7 +39,7 @@
     owner: root
     group: root
     mode: "0755"
-  when: resolver_client_manage_systemd_resolved | bool
+  when: resolver_client_use_systemd_resolved | bool
 
 - name: Configure systemd-resolved upstreams
   ansible.builtin.template:
@@ -21,7 +48,7 @@
     owner: root
     group: root
     mode: "0644"
-  when: resolver_client_manage_systemd_resolved | bool
+  when: resolver_client_use_systemd_resolved | bool
   notify: Restart systemd-resolved
 
 - name: Optionally manage resolv.conf symlink
@@ -31,7 +58,7 @@
     state: link
     force: true
   when:
-    - resolver_client_manage_systemd_resolved | bool
+    - resolver_client_use_systemd_resolved | bool
     - resolver_client_manage_resolv_conf_symlink | bool
   notify: Restart systemd-resolved
 
@@ -40,4 +67,13 @@
     name: systemd-resolved
     enabled: true
     state: started
-  when: resolver_client_manage_systemd_resolved | bool
+  when: resolver_client_use_systemd_resolved | bool
+
+- name: Manage resolv.conf directly when systemd-resolved is unavailable
+  ansible.builtin.template:
+    src: resolv.conf.j2
+    dest: "{{ resolver_client_resolv_conf_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+  when: not resolver_client_use_systemd_resolved | bool

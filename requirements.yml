@@ -4,7 +4,9 @@ roles:
   - name: robertdebock.users
     version: 6.1.8
   - name: oefenweb.ufw
-    version: 4.1.16
+    src: https://github.com/Oefenweb/ansible-ufw.git
+    scm: git
+    version: v4.1.16
 
 collections:
   - name: community.general

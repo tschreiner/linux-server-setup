@@ -1,0 +1,36 @@
+ansible_ssh_private_key_file: /absolute/path/to/private/key
+
+linux_server_setup_hostname_manage: true
+linux_server_setup_hostname: debian-example
+linux_server_setup_manage_firewall: true
+linux_server_setup_manage_resolver: true
+
+linux_server_setup_admin_users:
+  - name: ops
+    comment: Operations Administrator
+    group: ops
+    groups:
+      - sudo
+    shell: /bin/bash
+    sudo_options: "ALL=(ALL) NOPASSWD: ALL"
+    authorized_keys:
+      - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICHANGEMEEXAMPLEKEYREPLACEWITHREALKEY ops@example"
+
+access_policy_ssh_allowed_users:
+  - ops
+
+access_policy_admin_allowed_cidrs:
+  - 192.168.178.0/24
+
+resolver_client_nameservers:
+  - 1.1.1.1
+  - 9.9.9.9
+
+resolver_client_search_domains: []
+
+ufw_rules:
+  - rule: allow
+    from_ip: 192.168.178.0/24
+    to_port: 22
+    protocol: tcp
+    comment: allow ssh from admin lan

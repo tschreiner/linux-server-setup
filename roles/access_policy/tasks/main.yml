@@ -17,12 +17,6 @@
       - access_policy_admin_allowed_cidrs | length > 0
     fail_msg: Define at least one trusted source network in access_policy_admin_allowed_cidrs.
 
-- name: Ensure resolvers are defined before access policy is applied
-  ansible.builtin.assert:
-    that:
-      - resolver_client_nameservers | length > 0
-    fail_msg: Define at least one external DNS resolver before applying access policy.
-
 - name: Ensure sshd configuration drop-in directory exists
   ansible.builtin.file:
     path: /etc/ssh/sshd_config.d

@@ -46,6 +46,7 @@
         - firewall
 
     - role: resolver_client
+      when: linux_server_setup_manage_resolver | bool
       tags:
         - resolver
 

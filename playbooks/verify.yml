@@ -11,10 +11,10 @@
       tags:
         - verify
 
-    - name: Check configured DNS resolution path
-      ansible.builtin.command: resolvectl query debian.org
+    - name: Check DNS resolution works through configured path
+      ansible.builtin.command: getent hosts debian.org
       changed_when: false
-      when: resolver_client_manage_systemd_resolved | bool
+      when: linux_server_setup_manage_resolver | bool
       tags:
         - verify
 
