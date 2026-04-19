@@ -1,0 +1,6 @@
+---
+- name: Install baseline system packages
+  ansible.builtin.apt:
+    name: "{{ linux_server_setup_packages }}"
+    state: present
+    update_cache: true

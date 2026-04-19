@@ -1,0 +1,32 @@
+linux_server_setup_hostname_manage: true
+linux_server_setup_hostname: debian-example
+
+linux_server_setup_admin_users:
+  - name: ops
+    comment: Operations Administrator
+    group: ops
+    groups:
+      - sudo
+    shell: /bin/bash
+    sudo_options: "ALL=(ALL) ALL"
+    authorized_keys:
+      - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC87qU4JFlg0/hUQ3twsT3GvnAf9psfgAMGr82LnLqXrt6ImtZYJ0jcB9E184V6zZgVmCKpJZobHr+2TDpg0/lYbN/hLB+4xnn3xa5fROZwM4E+gE6FR+jAX6OHFLfTBRgpxWyV+UmR1aTopNvVOshWZ13+6XoIhDzmToGGrUWO2KkpUZpP09ekEvcG+46/FinivLPIVexW0xir1r9xkTAv2Zi4AEQREEMHExzus+1szkLe6n/Z1I7TX3jNgi4TLPolADS2usOhR9y+kZc7wejIYjdmqLW8bO22UWOhSVf1VFcLUixqRSg9Alp+UGZq8MUw9B59WO15gIYLG/6jBtjbNXG7J5EQrq0/9LPa+HgGky1pI24AzDwvvaKeeuBCqV1rfgvU2RHxuh60OzhnMBgYE7pMgPCt102i2RBtILuiKAbicYuGeNrJlwttls5OTFmeWGUv+v6X1A4RzOCd+FDkohQ2ELYC+Noc8fvBPy5j3tA8grVKRJPlRutrLnxLPUYPfgXQjyrZMx8C3KhWd8wiF1gPQ0kq9EV0wG4COc4KKj+NeNTaRefVv5K6Mj6yYpAoGALks11EbhTnVRzwVL+4pWINaIkbfACBVxayB/8VNTk7Ksrtjs6bwtLq5+3hkOt2Uals7lGEpi8P1p4GTlMe/BL+7Uo7Ku6krsHHWIzPQw== info@teddschreiner.de"
+
+access_policy_ssh_allowed_users:
+  - ops
+
+access_policy_admin_allowed_cidrs:
+  - 192.168.178.0/24
+
+resolver_client_nameservers:
+  - 1.1.1.1
+  - 9.9.9.9
+
+resolver_client_search_domains: []
+
+ufw_rules:
+  - rule: allow
+    from_ip: 192.168.178.0/24
+    to_port: 22
+    protocol: tcp
+    comment: allow ssh from admin lan

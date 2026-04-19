@@ -1,0 +1,9 @@
+Unattended-Upgrade::Origins-Pattern {
+{% for pattern in unattended_upgrades_origins_patterns %}
+        "{{ pattern }}";
+{% endfor %}
+};
+
+Unattended-Upgrade::AutoFixInterruptedDpkg "{{ 'true' if unattended_upgrades_auto_fix_interrupted_dpkg else 'false' }}";
+Unattended-Upgrade::Automatic-Reboot "{{ 'true' if unattended_upgrades_automatic_reboot else 'false' }}";
+Unattended-Upgrade::Automatic-Reboot-Time "{{ unattended_upgrades_automatic_reboot_time }}";

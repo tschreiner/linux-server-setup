@@ -1,0 +1,11 @@
+---
+- name: Validate and restart ssh
+  block:
+    - name: Validate sshd configuration
+      ansible.builtin.command: sshd -t
+      changed_when: false
+
+    - name: Restart ssh service
+      ansible.builtin.service:
+        name: ssh
+        state: restarted

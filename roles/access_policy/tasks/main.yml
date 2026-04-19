@@ -1,0 +1,41 @@
+---
+- name: Ensure admin users are defined
+  ansible.builtin.assert:
+    that:
+      - linux_server_setup_admin_users | length > 0
+    fail_msg: Define at least one admin user in linux_server_setup_admin_users.
+
+- name: Ensure allowed SSH users are defined
+  ansible.builtin.assert:
+    that:
+      - access_policy_ssh_allowed_users | length > 0
+    fail_msg: Define at least one allowed SSH user in access_policy_ssh_allowed_users.
+
+- name: Ensure allowed admin source networks are defined
+  ansible.builtin.assert:
+    that:
+      - access_policy_admin_allowed_cidrs | length > 0
+    fail_msg: Define at least one trusted source network in access_policy_admin_allowed_cidrs.
+
+- name: Ensure resolvers are defined before access policy is applied
+  ansible.builtin.assert:
+    that:
+      - resolver_client_nameservers | length > 0
+    fail_msg: Define at least one external DNS resolver before applying access policy.
+
+- name: Ensure sshd configuration drop-in directory exists
+  ansible.builtin.file:
+    path: /etc/ssh/sshd_config.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Configure SSH access policy drop-in
+  ansible.builtin.template:
+    src: sshd-linux-server-setup.conf.j2
+    dest: "/etc/ssh/sshd_config.d/{{ access_policy_sshd_dropin_priority }}-linux-server-setup.conf"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Validate and restart ssh

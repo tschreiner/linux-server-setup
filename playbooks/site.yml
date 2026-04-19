@@ -1,0 +1,59 @@
+---
+- name: Apply Debian server baseline
+  hosts: all
+  gather_facts: true
+  become: true
+
+  pre_tasks:
+    - name: Ensure example inventory is not used unchanged
+      ansible.builtin.assert:
+        that:
+          - inventory_hostname != 'debian-example' or access_policy_ssh_allowed_users | length > 0
+        fail_msg: Replace the example inventory and host variables before using this baseline on a real host.
+      tags:
+        - always
+
+  roles:
+    - role: base_common
+      tags:
+        - base
+
+    - role: robertdebock.users
+      when: linux_server_setup_manage_users | bool
+      vars:
+        users_groups: "{{ linux_server_setup_admin_groups }}"
+        users: "{{ linux_server_setup_admin_users }}"
+      tags:
+        - users
+
+    - role: packages
+      tags:
+        - packages
+
+    - role: devsec.hardening.os_hardening
+      when: linux_server_setup_enable_devsec_hardening | bool
+      tags:
+        - hardening
+
+    - role: devsec.hardening.ssh_hardening
+      when: linux_server_setup_enable_devsec_hardening | bool
+      tags:
+        - hardening
+
+    - role: oefenweb.ufw
+      when: linux_server_setup_manage_firewall | bool
+      tags:
+        - firewall
+
+    - role: resolver_client
+      tags:
+        - resolver
+
+    - role: access_policy
+      tags:
+        - access
+
+    - role: unattended_upgrades
+      when: linux_server_setup_manage_unattended_upgrades | bool
+      tags:
+        - updates

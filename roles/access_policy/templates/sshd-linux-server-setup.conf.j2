@@ -1,0 +1,8 @@
+PermitRootLogin no
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+ChallengeResponseAuthentication no
+PubkeyAuthentication yes
+UsePAM yes
+X11Forwarding no
+AllowUsers {{ access_policy_ssh_allowed_users | join(' ') }}

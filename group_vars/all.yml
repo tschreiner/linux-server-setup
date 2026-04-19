@@ -1,0 +1,82 @@
+linux_server_setup_timezone: Europe/Berlin
+
+linux_server_setup_manage_users: true
+linux_server_setup_enable_devsec_hardening: true
+linux_server_setup_manage_firewall: true
+linux_server_setup_manage_unattended_upgrades: true
+
+linux_server_setup_hostname_manage: false
+linux_server_setup_hostname: "{{ inventory_hostname }}"
+
+linux_server_setup_admin_groups:
+  - name: ops
+
+linux_server_setup_admin_users: []
+
+linux_server_setup_standard_directories:
+  - path: /opt/backups
+    owner: root
+    group: root
+    mode: "0750"
+  - path: /srv
+    owner: root
+    group: root
+    mode: "0755"
+
+linux_server_setup_packages:
+  - sudo
+  - curl
+  - wget
+  - vim
+  - git
+  - rsync
+  - tmux
+  - htop
+  - iotop
+  - iftop
+  - dnsutils
+  - net-tools
+  - iproute2
+  - traceroute
+  - mtr-tiny
+  - tcpdump
+  - jq
+  - unzip
+  - zip
+  - ca-certificates
+  - gnupg
+  - lsb-release
+  - acl
+  - bash-completion
+  - logrotate
+  - needrestart
+
+access_policy_ssh_allowed_users: []
+access_policy_admin_allowed_cidrs: []
+access_policy_sshd_dropin_priority: 60
+
+resolver_client_nameservers: []
+resolver_client_fallback_nameservers: []
+resolver_client_search_domains: []
+resolver_client_manage_systemd_resolved: true
+resolver_client_manage_resolv_conf_symlink: false
+
+base_common_journald_storage: persistent
+base_common_journald_system_max_use: 512M
+base_common_journald_runtime_max_use: 128M
+
+ufw_default_incoming_policy: deny
+ufw_default_outgoing_policy: allow
+ufw_logging: low
+ufw_rules: []
+
+unattended_upgrades_auto_fix_interrupted_dpkg: true
+unattended_upgrades_update_package_lists: 1
+unattended_upgrades_download_upgradeable_packages: 1
+unattended_upgrades_autoclean_interval: 7
+unattended_upgrades_automatic_reboot: false
+unattended_upgrades_automatic_reboot_time: "03:30"
+unattended_upgrades_origins_patterns:
+  - 'origin=Debian,codename=${distro_codename},label=Debian-Security'
+  - 'origin=Debian,codename=${distro_codename},label=Debian'
+  - 'origin=Debian,codename=${distro_codename}-updates,label=Debian'

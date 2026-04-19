@@ -1,0 +1,33 @@
+---
+- name: Verify Debian server baseline
+  hosts: all
+  gather_facts: true
+  become: true
+
+  tasks:
+    - name: Check SSH configuration syntax
+      ansible.builtin.command: sshd -t
+      changed_when: false
+      tags:
+        - verify
+
+    - name: Check configured DNS resolution path
+      ansible.builtin.command: resolvectl query debian.org
+      changed_when: false
+      when: resolver_client_manage_systemd_resolved | bool
+      tags:
+        - verify
+
+    - name: Check that UFW is active
+      ansible.builtin.command: ufw status verbose
+      changed_when: false
+      when: linux_server_setup_manage_firewall | bool
+      tags:
+        - verify
+
+    - name: Check unattended-upgrades dry run
+      ansible.builtin.command: unattended-upgrade --dry-run --debug
+      changed_when: false
+      when: linux_server_setup_manage_unattended_upgrades | bool
+      tags:
+        - verify

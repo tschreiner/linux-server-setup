@@ -1,0 +1,43 @@
+---
+- name: Ensure at least one resolver is defined
+  ansible.builtin.assert:
+    that:
+      - resolver_client_nameservers | length > 0
+    fail_msg: Define at least one external DNS resolver in resolver_client_nameservers.
+
+- name: Ensure systemd-resolved configuration directory exists
+  ansible.builtin.file:
+    path: /etc/systemd/resolved.conf.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  when: resolver_client_manage_systemd_resolved | bool
+
+- name: Configure systemd-resolved upstreams
+  ansible.builtin.template:
+    src: resolved-linux-server-setup.conf.j2
+    dest: /etc/systemd/resolved.conf.d/10-linux-server-setup.conf
+    owner: root
+    group: root
+    mode: "0644"
+  when: resolver_client_manage_systemd_resolved | bool
+  notify: Restart systemd-resolved
+
+- name: Optionally manage resolv.conf symlink
+  ansible.builtin.file:
+    src: /run/systemd/resolve/stub-resolv.conf
+    dest: /etc/resolv.conf
+    state: link
+    force: true
+  when:
+    - resolver_client_manage_systemd_resolved | bool
+    - resolver_client_manage_resolv_conf_symlink | bool
+  notify: Restart systemd-resolved
+
+- name: Ensure systemd-resolved is enabled and running
+  ansible.builtin.service:
+    name: systemd-resolved
+    enabled: true
+    state: started
+  when: resolver_client_manage_systemd_resolved | bool

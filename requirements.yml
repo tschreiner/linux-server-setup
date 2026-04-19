@@ -1,0 +1,12 @@
+roles:
+  - name: robertdebock.bootstrap
+    version: 7.1.7
+  - name: robertdebock.users
+    version: 6.1.8
+  - name: oefenweb.ufw
+    version: 4.1.16
+
+collections:
+  - name: community.general
+  - name: devsec.hardening
+    version: 10.5.2

@@ -1,0 +1,43 @@
+---
+- name: Set hostname
+  ansible.builtin.hostname:
+    name: "{{ linux_server_setup_hostname }}"
+  when: linux_server_setup_hostname_manage | bool
+
+- name: Set timezone
+  community.general.timezone:
+    name: "{{ linux_server_setup_timezone }}"
+
+- name: Ensure standard directories exist
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner | default('root') }}"
+    group: "{{ item.group | default('root') }}"
+    mode: "{{ item.mode | default('0755') }}"
+  loop: "{{ linux_server_setup_standard_directories }}"
+
+- name: Ensure journald persistent directory exists
+  ansible.builtin.file:
+    path: /var/log/journal
+    state: directory
+    owner: root
+    group: systemd-journal
+    mode: "2755"
+
+- name: Ensure journald configuration directory exists
+  ansible.builtin.file:
+    path: /etc/systemd/journald.conf.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Configure journald persistence and limits
+  ansible.builtin.template:
+    src: journald-linux-server-setup.conf.j2
+    dest: /etc/systemd/journald.conf.d/10-linux-server-setup.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart journald

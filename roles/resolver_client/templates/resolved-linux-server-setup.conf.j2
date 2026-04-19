@@ -1,0 +1,9 @@
+[Resolve]
+DNS={{ resolver_client_nameservers | join(' ') }}
+{% if resolver_client_fallback_nameservers | length > 0 %}
+FallbackDNS={{ resolver_client_fallback_nameservers | join(' ') }}
+{% endif %}
+{% if resolver_client_search_domains | length > 0 %}
+Domains={{ resolver_client_search_domains | join(' ') }}
+{% endif %}
+DNSStubListener=yes

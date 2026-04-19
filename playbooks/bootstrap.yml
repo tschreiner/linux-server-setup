@@ -1,0 +1,10 @@
+---
+- name: Bootstrap fresh hosts for Ansible management
+  hosts: all
+  gather_facts: false
+  become: true
+
+  roles:
+    - role: robertdebock.bootstrap
+      tags:
+        - bootstrap
