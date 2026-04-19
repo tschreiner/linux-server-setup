@@ -1,0 +1,60 @@
+---
+- name: Determine Docker APT architecture
+  ansible.builtin.set_fact:
+    docker_engine_apt_architecture: "{{ {'x86_64': 'amd64', 'aarch64': 'arm64', 'armv7l': 'armhf', 'armv6l': 'armhf'}.get(ansible_architecture, ansible_architecture) }}"
+
+- name: Ensure Docker repository prerequisites are installed
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - curl
+      - gnupg
+    state: present
+    update_cache: true
+  when: docker_engine_manage_repository | bool
+
+- name: Ensure APT keyrings directory exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  when: docker_engine_manage_repository | bool
+
+- name: Install Docker APT repository key
+  ansible.builtin.get_url:
+    url: "{{ docker_engine_apt_repository_url }}/gpg"
+    dest: "{{ docker_engine_apt_keyring_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+  when: docker_engine_manage_repository | bool
+
+- name: Configure Docker APT repository
+  ansible.builtin.apt_repository:
+    repo: "deb [arch={{ docker_engine_apt_architecture }} signed-by={{ docker_engine_apt_keyring_path }}] {{ docker_engine_apt_repository_url }} {{ ansible_distribution_release }} stable"
+    filename: docker
+    state: present
+    update_cache: true
+  when: docker_engine_manage_repository | bool
+
+- name: Install Docker Engine and Compose packages
+  ansible.builtin.apt:
+    name: "{{ docker_engine_packages }}"
+    state: "{{ docker_engine_package_state }}"
+    update_cache: true
+
+- name: Ensure Docker daemon is enabled and started
+  ansible.builtin.service:
+    name: docker
+    enabled: "{{ docker_engine_service_enabled }}"
+    state: "{{ docker_engine_service_state }}"
+
+- name: Add configured users to the docker group
+  ansible.builtin.user:
+    name: "{{ item }}"
+    groups: docker
+    append: true
+  loop: "{{ docker_engine_users }}"
+  when: docker_engine_users | length > 0

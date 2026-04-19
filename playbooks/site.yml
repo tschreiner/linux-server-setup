@@ -30,6 +30,11 @@
       tags:
         - packages
 
+    - role: docker_engine
+      when: linux_server_setup_manage_docker | bool
+      tags:
+        - docker
+
     - role: devsec.hardening.os_hardening
       when: linux_server_setup_enable_devsec_hardening | bool
       tags:

@@ -3,7 +3,6 @@
 Ansible-Baseline fuer einen neuen Debian-13-Server mit Fokus auf sicheren Erstzugang, ueblichen Systempaketen, Updates, Firewall und Resolver-Client-Konfiguration.
 
 Nicht im Scope:
-- Docker oder andere Container-Plattformen
 - Direkte Installation von Tailscale auf dem Host
 - Direkter Betrieb von Unbound auf dem Host
 
@@ -11,6 +10,7 @@ Nicht im Scope:
 
 - `robertdebock.bootstrap` fuer den Day-0-Bootstrap
 - optional `robertdebock.users` fuer Admin-User und SSH-Keys
+- optionale Docker-Engine-Installation mit Docker Compose Plugin und aktiviertem Docker-Daemon
 - `devsec.hardening` fuer OS- und SSH-Hardening
 - optional `oefenweb.ufw` fuer die Host-Firewall
 - Eigene Rollen fuer Basis-Hosteinstellungen, Paketprofil, optionalen Resolver-Client, Zugriffspolitik und automatische Updates
@@ -73,6 +73,8 @@ ansible-playbook playbooks/verify.yml -l debian-example
 
 - `linux_server_setup_admin_users`: Admin-Accounts fuer `robertdebock.users`
 - `linux_server_setup_hostname_manage`: Hostname-Verwaltung ein- oder ausschalten
+- `linux_server_setup_manage_docker`: Docker Engine, Compose Plugin und Docker-Daemon ein- oder ausschalten
+- `docker_engine_users`: optionale Benutzer, die zusaetzlich in die lokale Gruppe `docker` aufgenommen werden
 - `access_policy_ssh_allowed_users`: SSH-Allowlist
 - `access_policy_admin_allowed_cidrs`: erlaubte Quellnetze fuer SSH
 - `linux_server_setup_manage_resolver`: Resolver-Konfiguration des Hosts ein- oder ausschalten
@@ -85,6 +87,7 @@ ansible-playbook playbooks/verify.yml -l debian-example
 
 - Das Beispielinventar ist absichtlich nicht direkt produktionsreif. Der erste produktive Lauf soll fehlschlagen, wenn kein Admin-User, kein SSH-Key, kein erlaubtes Quellnetz oder kein Resolver gesetzt wurde.
 - Fuer produktive Nutzung immer die `.example`-Dateien nach `inventory/hosts.yml` und `inventory/host_vars/<host>.yml` kopieren und nur die lokalen Kopien anpassen. Das Repository bleibt dadurch standardmaessig anonymisiert.
+- Docker ist optional. Wenn `linux_server_setup_manage_docker` aktiviert wird, installiert die Rolle die Docker-APT-Quelle, `docker-ce`, `docker-ce-cli`, `containerd.io`, `docker-buildx-plugin` und `docker-compose-plugin` und aktiviert den Docker-Daemon.
 - `hostname`, `ufw` und Resolver-Verwaltung sind opt-in. Standardmaessig bleibt der Hostname unberuehrt, die Firewall wird nicht verwaltet und es wird keine lokale Resolver-Konfiguration ausgerollt.
 - Wenn `systemd-resolved` auf dem Zielhost nicht vorhanden ist, faellt die Resolver-Rolle automatisch auf eine direkte Verwaltung von `/etc/resolv.conf` zurueck, statt den Lauf abzubrechen.
 - SSH-Hardening wird konservativ ueber die eigene Rolle `access_policy` ergaenzt, damit Root-Login und Passwort-Login auch dann explizit abgeschaltet werden, wenn zusaetzliche Hardening-Rollen spaeter ausgetauscht werden.

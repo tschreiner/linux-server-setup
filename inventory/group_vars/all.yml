@@ -2,6 +2,7 @@ linux_server_setup_timezone: Europe/Berlin
 
 linux_server_setup_manage_users: true
 linux_server_setup_enable_devsec_hardening: true
+linux_server_setup_manage_docker: false
 linux_server_setup_manage_firewall: false
 linux_server_setup_manage_resolver: false
 linux_server_setup_manage_unattended_upgrades: true

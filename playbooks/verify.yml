@@ -11,6 +11,34 @@
       tags:
         - verify
 
+    - name: Check Docker CLI version
+      ansible.builtin.command: docker --version
+      changed_when: false
+      when: linux_server_setup_manage_docker | bool
+      tags:
+        - verify
+
+    - name: Check Docker Compose plugin version
+      ansible.builtin.command: docker compose version
+      changed_when: false
+      when: linux_server_setup_manage_docker | bool
+      tags:
+        - verify
+
+    - name: Check Docker daemon is active
+      ansible.builtin.command: systemctl is-active docker
+      changed_when: false
+      when: linux_server_setup_manage_docker | bool
+      tags:
+        - verify
+
+    - name: Check Docker daemon is enabled
+      ansible.builtin.command: systemctl is-enabled docker
+      changed_when: false
+      when: linux_server_setup_manage_docker | bool
+      tags:
+        - verify
+
     - name: Check DNS resolution works through configured path
       ansible.builtin.command: getent hosts debian.org
       changed_when: false

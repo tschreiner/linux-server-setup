@@ -2,6 +2,9 @@ ansible_ssh_private_key_file: /absolute/path/to/private/key
 
 linux_server_setup_hostname_manage: true
 linux_server_setup_hostname: debian-example
+linux_server_setup_manage_docker: false
+docker_engine_users:
+  - ops
 linux_server_setup_manage_firewall: true
 linux_server_setup_manage_resolver: true
 
